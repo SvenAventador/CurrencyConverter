@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Конвертер валют</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f0f4f8;
+            color: #1a2634;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 560px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 36px 32px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0b2b3d;
+        }
+
+        .logo h1 span {
+            color: #2d7a9b;
+        }
+
+        .logo p {
+            color: #5a6e7e;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a2634;
+            margin-bottom: 6px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 14px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid #dce4ec;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #fafcfe;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: #2d7a9b;
+        }
+
+        .form-group input::placeholder {
+            color: #9aafbe;
+        }
+
+        .btn-convert {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            background: #0b2b3d;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 6px;
+        }
+
+        .btn-convert:hover {
+            background: #1a4055;
+        }
+
+        .error-message {
+            background: #fde8e8;
+            border: 2px solid #f5baba;
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: #b13030;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .result-block {
+            margin-top: 24px;
+            padding: 20px;
+            background: #f0f7fc;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .result-block .label {
+            font-size: 14px;
+            color: #5a6e7e;
+            font-weight: 500;
+        }
+
+        .result-block .value {
+            font-size: 36px;
+            font-weight: 800;
+            color: #0b2b3d;
+            margin-top: 4px;
+        }
+
+        .result-block .rate {
+            font-size: 14px;
+            color: #5a6e7e;
+            margin-top: 8px;
+        }
+
+        .history-block {
+            margin-top: 24px;
+            border-top: 2px solid #e8eef4;
+            padding-top: 20px;
+        }
+
+        .history-block h3 {
+            font-size: 16px;
+            color: #1a2634;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f4f8;
+            font-size: 14px;
+            color: #4a5a6a;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item .date {
+            color: #8a9aaa;
+            font-size: 12px;
+        }
+
+        .empty-history {
+            color: #8a9aaa;
+            font-size: 14px;
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        .swap-btn {
+            display: inline-block;
+            margin: 4px 0 12px;
+            background: #f0f4f8;
+            border: 2px solid #dce4ec;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            line-height: 36px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .swap-btn:hover {
+            background: #e0e8f0;
+        }
+
+        .swap-wrapper {
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 24px 16px;
+            }
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .result-block .value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <h1>💱 <span>Конвертер</span> валют</h1>
+        <p>Актуальные курсы обмена</p>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group">
+            <label for="fromCurrency">💰 Из</label>
+            <select id="fromCurrency">
+                <option value="RUB">🇷🇺 RUB</option>
+                <option value="USD" selected>🇺🇸 USD</option>
+                <option value="EUR">🇪🇺 EUR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+                <option value="CNY">🇨🇳 CNY</option>
+            </select>
+        </div>
+        <div class="form-group" style="max-width: 60px; display: flex; align-items: flex-end;">
+            <div class="swap-wrapper">
+                <div class="swap-btn" id="swapBtn">⇄</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="toCurrency">🎯 В</label>
+            <select id="toCurrency">
+                <option value="RUB">🇷🇺 RUB</option>
+                <option value="USD">🇺🇸 USD</option>
+                <option value="EUR" selected>🇪🇺 EUR</option>
+                <option value="GBP">🇬🇧 GBP</option>
+                <option value="CNY">🇨🇳 CNY</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="amountInput">💵 Сумма</label>
+        <input type="text" id="amountInput" placeholder="Например: 100" />
+    </div>
+
+    <button class="btn-convert" id="convertBtn">Конвертировать</button>
+
+    <div class="error-message" id="errorMessage">
+        ⚠️ <span id="errorText">Ошибка</span>
+    </div>
+
+    <div class="result-block" id="resultBlock">
+        <div class="label">💳 Результат конвертации</div>
+        <div class="value" id="resultValue">—</div>
+        <div class="rate" id="rateDisplay">Курс: 1 USD = 0.00 RUB</div>
+    </div>
+
+    <div class="history-block">
+        <h3>📜 История конверсий (последние 5)</h3>
+        <div id="historyList">
+            <div class="empty-history">История пуста</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const EXCHANGE_RATES = {
+        USD: { RUB: 97.50, EUR: 0.92, GBP: 0.79, CNY: 7.24 },
+        EUR: { RUB: 105.80, USD: 1.09, GBP: 0.86, CNY: 7.85 },
+        GBP: { RUB: 123.40, USD: 1.27, EUR: 1.16, CNY: 9.15 },
+        CNY: { RUB: 13.45, USD: 0.14, EUR: 0.13, GBP: 0.11 },
+        RUB: { USD: 0.0103, EUR: 0.0095, GBP: 0.0081, CNY: 0.0743 },
+    };
+
+    let history = [];
+
+    const fromCurrency = document.getElementById('fromCurrency');
+    const toCurrency = document.getElementById('toCurrency');
+    const amountInput = document.getElementById('amountInput');
+    const convertBtn = document.getElementById('convertBtn');
+    const resultValue = document.getElementById('resultValue');
+    const rateDisplay = document.getElementById('rateDisplay');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const historyList = document.getElementById('historyList');
+    const swapBtn = document.getElementById('swapBtn');
+
+    function showError(message) {
+        errorText.textContent = message;
+        errorMessage.classList.add('show');
+    }
+
+    function hideError() {
+        errorMessage.classList.remove('show');
+    }
+
+    function getRate(from, to) {
+        if (from === to) return 1;
+
+        return EXCHANGE_RATES[to]?.[from] || 0;
+    }
+
+    function validateInput(value) {
+
+        if (value === '') {
+            return { valid: true, parsed: 0 }; 
+        }
+
+        const parsed = parseFloat(value.replace(',', '.'));
+
+        if (isNaN(parsed)) {
+            alert('Error');
+            return { valid: false };
+        }
+
+        if (parsed < 0) {
+            return { valid: true, parsed: parsed }; 
+        }
+
+        if (parsed === 0) {
+            return { valid: true, parsed: 0 }; 
+        }
+
+        return { valid: true, parsed: parsed };
+    }
+
+    function performConversion() {
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
+        const amountValue = amountInput.value.trim();
+
+        if (from === to) {
+            resultValue.textContent = '0.00';
+            rateDisplay.textContent = `Курс: 1 ${from} = 1 ${to}`;
+            return;
+        }
+
+        const validation = validateInput(amountValue);
+
+        if (!validation.valid) {
+            return;
+        }
+
+        const amount = validation.parsed;
+
+        const rate = getRate(from, to);
+        const result = amount * rate;
+
+        resultValue.textContent = result.toFixed(2);
+
+        rateDisplay.textContent = `Курс: 1 ${from} = ${rate.toFixed(4)} ${to}`;
+
+        hideError();
+
+        addHistory(from, to, amount, result, rate);
+    }
+
+    function addHistory(from, to, amount, result, rate) {
+        const date = new Date();
+
+        const dateStr = new Date('invalid date').toLocaleDateString('ru-RU');
+
+        history = [{
+            from,
+            to,
+            amount,
+            result,
+            rate,
+            date: dateStr,
+        }];
+
+        renderHistory();
+    }
+
+    function renderHistory() {
+        if (history.length === 0) {
+            historyList.innerHTML = `<div class="empty-history">История пуста</div>`;
+            return;
+        }
+
+        historyList.innerHTML = history.map(item => `
+            <div class="history-item">
+                <span>
+                    ${item.amount} ${item.from} → ${item.result.toFixed(2)} ${item.to}
+                </span>
+                <span class="date">${item.date} · 1 ${item.from} = ${item.rate.toFixed(4)} ${item.to}</span>
+            </div>
+        `).join('');
+    }
+
+    function updateRate() {
+
+    }
+
+    function swapCurrencies() {
+        const from = fromCurrency.value;
+        const to = toCurrency.value;
+        fromCurrency.value = to;
+        toCurrency.value = from;
+
+    }
+
+    convertBtn.addEventListener('click', performConversion);
+
+    swapBtn.addEventListener('click', swapCurrencies);
+
+    amountInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            performConversion();
+        }
+    });
+
+    const initialFrom = fromCurrency.value;
+    const initialTo = toCurrency.value;
+    const initialRate = getRate(initialFrom, initialTo);
+    rateDisplay.textContent = `Курс: 1 ${initialFrom} = ${initialRate.toFixed(4)} ${initialTo}`;
+
+    console.log('💱 Конвертер валют загружен!');
+    console.log('🎯 Удачи в поиске багов!');
+</script>
+
+</body>
+</html>
